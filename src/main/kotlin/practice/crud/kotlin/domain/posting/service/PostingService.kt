@@ -2,12 +2,10 @@ package practice.crud.kotlin.domain.posting.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import practice.crud.kotlin.domain.posting.Posting
 import practice.crud.kotlin.domain.posting.dto.req.PostingReqDto
 import practice.crud.kotlin.domain.posting.dto.req.PostingUpdateReqDto
 import practice.crud.kotlin.domain.posting.dto.res.PostingResDto
 import practice.crud.kotlin.domain.posting.repository.PostingRepository
-import practice.crud.kotlin.global.util.ResponseDtoUtil
 
 @Service
 class PostingService(
@@ -39,7 +37,7 @@ class PostingService(
     @Transactional(readOnly = true)
     fun getOnePosting(postingIdx: Long): PostingResDto?{
         val posting = postingRepository.findById(postingIdx).orElseThrow { RuntimeException() }
-        val result = ResponseDtoUtil.mapping(posting, PostingResDto::class.java)
+        val result = PostingResDto(posting)
         return result
     }
 }
