@@ -33,7 +33,7 @@ class PostingController(
     }
 
     @GetMapping
-    fun getAll(): ResponseEntity<List<PostingResDto?>>{
+    fun getAll(): ResponseEntity<List<PostingResDto>>{
         val result = postingService.getAllPosting();
         return ResponseEntity(result, HttpStatus.OK)
     }
