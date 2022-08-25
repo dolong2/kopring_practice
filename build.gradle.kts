@@ -28,6 +28,11 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	runtimeOnly("com.h2database:h2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("io.jsonwebtoken:jjwt-api:0.11.1")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.1")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.1")
+	implementation("io.github.microutils:kotlin-logging-jvm:2.0.6")
 }
 
 tasks.withType<KotlinCompile> {
