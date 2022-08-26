@@ -7,6 +7,7 @@ import practice.crud.kotlin.domain.member.dto.req.SignInReqDto
 import practice.crud.kotlin.domain.member.dto.res.SignInResDto
 import practice.crud.kotlin.domain.member.repository.MemberRepository
 import practice.crud.kotlin.global.config.security.jwt.TokenProvider
+import practice.crud.kotlin.global.util.CurrentMemberUtil
 import kotlin.RuntimeException
 
 @Service
@@ -14,6 +15,7 @@ class MemberService(
     private val memberRepository: MemberRepository,
     private val tokenProvider: TokenProvider,
     private val passwordEncoder: PasswordEncoder,
+    private val currentMemberUtil: CurrentMemberUtil
 ){
     fun joinMember(memberReqDto: MemberReqDto): Long{
         if(memberRepository.existsByEmail(memberReqDto.email))
@@ -32,10 +34,16 @@ class MemberService(
             throw RuntimeException()//패스워드 일치 X
         val accessToken = tokenProvider.createAccessToken(member.email)
         val refreshToken = tokenProvider.createRefreshToken(member.email)
+        member.updateRefreshToken(refreshToken)
         return SignInResDto(
             email = member.email,
             accessToken = accessToken,
             refreshToken = refreshToken
         )
+    }
+
+    fun logout(){
+        val member = currentMemberUtil.getCurrentMember()
+        member.updateRefreshToken(null)
     }
 }

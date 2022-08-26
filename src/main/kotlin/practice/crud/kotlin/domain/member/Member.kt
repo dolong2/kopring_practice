@@ -18,4 +18,8 @@ class Member(
     val id: Long = 0
     @OneToMany(cascade = [CascadeType.REMOVE], mappedBy = "writer")
     var postings: List<Posting> = mutableListOf()
+    var refreshToken: String? = null
+    fun updateRefreshToken(refreshToken: String?){
+        this.refreshToken = refreshToken
+    }
 }
