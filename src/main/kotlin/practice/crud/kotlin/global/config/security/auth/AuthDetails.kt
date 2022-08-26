@@ -7,6 +7,9 @@ import practice.crud.kotlin.domain.member.Member
 class AuthDetails(
     val member: Member,
 ) :UserDetails {
+
+    fun getEmail(): String = member.email
+
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return member.roles
     }
