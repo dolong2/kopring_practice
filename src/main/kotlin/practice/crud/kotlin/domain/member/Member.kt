@@ -8,8 +8,6 @@ class Member(
     var email: String,
     var password: String,
     var name: String,
-    @OneToMany(cascade = [CascadeType.REMOVE], mappedBy = "writer")
-    var postings: List<Posting>,
     @Enumerated(EnumType.STRING) @Column(name = "Role")
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "Role", joinColumns = [JoinColumn(name = "member_id")])
@@ -18,4 +16,6 @@ class Member(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Long = 0
+    @OneToMany(cascade = [CascadeType.REMOVE], mappedBy = "writer")
+    var postings: List<Posting> = mutableListOf()
 }

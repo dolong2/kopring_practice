@@ -17,7 +17,7 @@ class TokenProvider {
     private val ACCESS_TOKEN_EXPIRE_TIME:Long = 1000 * 60 * 60 * 3// 3시간
     private val REFRESH_TOKEN_EXPIRE_TIME:Long= ACCESS_TOKEN_EXPIRE_TIME/3 * 24 * 30 * 6
     @Value("\${jwt.secret}")
-    val SECRET_KEY:String = ""
+    private val SECRET_KEY:String = ""
 
     private enum class TokenType(val value: String){
         ACCESS_TOKEN("accessToken"),
@@ -56,6 +56,7 @@ class TokenProvider {
     }
 
     private fun createToken(type: TokenType, email: String, expiredTime: Long): String{
+        println(SECRET_KEY)
         val claims = Jwts.claims()
         claims.put(TokenClaimName.USER_EMAIL.value, email)
         claims.put(TokenClaimName.TOKEN_TYPE.value, type.value)
