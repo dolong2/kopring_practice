@@ -6,26 +6,37 @@ import practice.crud.kotlin.domain.posting.dto.req.PostingReqDto
 import practice.crud.kotlin.domain.posting.dto.req.PostingUpdateReqDto
 import practice.crud.kotlin.domain.posting.dto.res.PostingResDto
 import practice.crud.kotlin.domain.posting.repository.PostingRepository
+import practice.crud.kotlin.global.util.CurrentMemberUtil
 
 @Service
 class PostingService(
     private val postingRepository: PostingRepository,
+    private val currentMemberUtil: CurrentMemberUtil,
 ){
     @Transactional
     fun writePosting(postingReqDto: PostingReqDto): Long {
-        val posting = postingReqDto.toEntity()
+        val posting = postingReqDto.toEntity(currentMemberUtil.getCurrentMember())
         return postingRepository.save(posting).id
     }
 
     @Transactional
     fun deletePosting(postingIdx: Long) {
+        val posting = postingRepository.findById(postingIdx)
+            .orElseThrow { throw RuntimeException() }
+        if(posting.writer != currentMemberUtil.getCurrentMember()){
+            throw RuntimeException()
+        }
         postingRepository.deleteById(postingIdx)
     }
 
     @Transactional
     fun updatePosting(postingIdx: Long, postingUpdateReqDto: PostingUpdateReqDto) {
         val posting = postingRepository.findById(postingIdx).orElseThrow { RuntimeException() }
-        posting.update(posting.title, posting.content)
+        val writer = currentMemberUtil.getCurrentMember()
+        if(posting.writer != writer){
+            throw RuntimeException()
+        }
+        posting.update(postingUpdateReqDto)
     }
 
     @Transactional(readOnly = true)

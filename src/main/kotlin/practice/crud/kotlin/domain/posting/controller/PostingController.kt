@@ -47,7 +47,7 @@ class PostingController(
     }
 
     @PutMapping("/{postingIdx}")
-    fun updatePosting(@PathVariable postingIdx: Long, @RequestBody postingUpdateReqDto: PostingUpdateReqDto): ResponseEntity<SuccessResponse>{
+    fun updatePosting(@PathVariable postingIdx: Long,@Validated @RequestBody postingUpdateReqDto: PostingUpdateReqDto): ResponseEntity<SuccessResponse>{
         postingService.updatePosting(postingIdx, postingUpdateReqDto)
         return ResponseEntity(SuccessResponse, HttpStatus.OK)
     }

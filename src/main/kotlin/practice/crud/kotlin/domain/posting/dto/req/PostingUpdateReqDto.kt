@@ -9,17 +9,8 @@ import javax.validation.constraints.NotBlank
 class PostingUpdateReqDto(
     @field:NotNull
     @field:NotBlank
-    private val title:String,
+    val title:String,
     @field:NotNull
     @field:NotBlank
-    private val content:String,
-) {
-    fun toEntity(): Posting {
-        return Posting(
-            writer = null,
-            title = this.title,
-            content = this.content,
-            date = LocalDate.now(),
-        )
-    }
-}
+    val content:String,
+)
