@@ -46,4 +46,10 @@ class MemberService(
         val member = currentMemberUtil.getCurrentMember()
         member.updateRefreshToken(null)
     }
+
+    fun withdrawal(){
+        logout()
+        val member = currentMemberUtil.getCurrentMember()
+        memberRepository.delete(member)
+    }
 }

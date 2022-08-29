@@ -2,6 +2,7 @@ package practice.crud.kotlin.domain.posting.controller
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -15,7 +16,6 @@ import practice.crud.kotlin.domain.posting.dto.req.PostingUpdateReqDto
 import practice.crud.kotlin.domain.posting.dto.res.PostingResDto
 import practice.crud.kotlin.domain.posting.service.PostingService
 import practice.crud.kotlin.global.response.SuccessResponse
-import javax.validation.Valid
 
 @RestController
 @RequestMapping("/v1/posting")
@@ -23,7 +23,7 @@ class PostingController(
     private val postingService: PostingService
 ){
     @PostMapping
-    fun writePosting(@RequestBody @Valid postingReqDto: PostingReqDto): ResponseEntity<SuccessResponse>{
+    fun writePosting(@RequestBody @Validated postingReqDto: PostingReqDto): ResponseEntity<SuccessResponse>{
         postingService.writePosting(postingReqDto)
         return ResponseEntity(SuccessResponse, HttpStatus.CREATED);
     }
