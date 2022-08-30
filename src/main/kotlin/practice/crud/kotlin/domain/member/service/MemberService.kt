@@ -7,6 +7,10 @@ import practice.crud.kotlin.domain.member.dto.req.SignInReqDto
 import practice.crud.kotlin.domain.member.dto.res.SignInResDto
 import practice.crud.kotlin.domain.member.repository.MemberRepository
 import practice.crud.kotlin.global.config.security.jwt.TokenProvider
+import practice.crud.kotlin.global.exception.ErrorCode
+import practice.crud.kotlin.global.exception.exception.MemberAlreadyExistException
+import practice.crud.kotlin.global.exception.exception.MemberNotExistException
+import practice.crud.kotlin.global.exception.exception.PasswordNotCorrectException
 import practice.crud.kotlin.global.util.CurrentMemberUtil
 import kotlin.RuntimeException
 
@@ -19,7 +23,7 @@ class MemberService(
 ){
     fun joinMember(memberReqDto: MemberReqDto): Long{
         if(memberRepository.existsByEmail(memberReqDto.email))
-            throw RuntimeException()//유저가 이미 존재함
+            throw MemberAlreadyExistException(ErrorCode.USER_ALREADY_EXIST)
         val encodedPassword = passwordEncoder.encode(memberReqDto.password)
         val member = memberReqDto.toEntity(encodedPassword)
         return memberRepository.save(member).id
@@ -27,11 +31,11 @@ class MemberService(
 
     fun signIn(signInDto: SignInReqDto):SignInResDto{
         if(!memberRepository.existsByEmail(signInDto.email))
-            throw RuntimeException()//유저가 존재하지 않음
+            throw MemberNotExistException(ErrorCode.NOT_EXIST_MEMBER)
         val member = memberRepository.findByEmail(signInDto.email)
-            .orElseThrow { RuntimeException() }
+            .orElseThrow { MemberNotExistException(ErrorCode.NOT_EXIST_MEMBER) }
         if (!passwordEncoder.matches(signInDto.password, member.password))
-            throw RuntimeException()//패스워드 일치 X
+            throw PasswordNotCorrectException(ErrorCode.PASSWORD_NOT_CORRECT)//패스워드 일치 X
         val accessToken = tokenProvider.createAccessToken(member.email)
         val refreshToken = tokenProvider.createRefreshToken(member.email)
         member.updateRefreshToken(refreshToken)

@@ -2,10 +2,13 @@ package practice.crud.kotlin.domain.posting.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import practice.crud.kotlin.domain.member.Role
 import practice.crud.kotlin.domain.posting.dto.req.PostingReqDto
 import practice.crud.kotlin.domain.posting.dto.req.PostingUpdateReqDto
 import practice.crud.kotlin.domain.posting.dto.res.PostingResDto
 import practice.crud.kotlin.domain.posting.repository.PostingRepository
+import practice.crud.kotlin.global.exception.ErrorCode
+import practice.crud.kotlin.global.exception.exception.NotWriterException
 import practice.crud.kotlin.global.util.CurrentMemberUtil
 
 @Service
@@ -23,8 +26,8 @@ class PostingService(
     fun deletePosting(postingIdx: Long) {
         val posting = postingRepository.findById(postingIdx)
             .orElseThrow { throw RuntimeException() }
-        if(posting.writer != currentMemberUtil.getCurrentMember()){
-            throw RuntimeException()
+        if(posting.writer != currentMemberUtil.getCurrentMember() || !currentMemberUtil.getCurrentMember().roles.contains(Role.ROLE_ADMIN)){
+            throw NotWriterException(ErrorCode.NOT_WRITER_EXCEPTION)
         }
         postingRepository.deleteById(postingIdx)
     }
@@ -34,7 +37,7 @@ class PostingService(
         val posting = postingRepository.findById(postingIdx).orElseThrow { RuntimeException() }
         val writer = currentMemberUtil.getCurrentMember()
         if(posting.writer != writer){
-            throw RuntimeException()
+            throw NotWriterException(ErrorCode.NOT_WRITER_EXCEPTION)
         }
         posting.update(postingUpdateReqDto)
     }
