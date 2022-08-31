@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import practice.crud.kotlin.global.config.security.auth.AuthDetailService
 import practice.crud.kotlin.global.config.security.jwt.TokenProvider
+import practice.crud.kotlin.global.exception.ErrorCode
+import practice.crud.kotlin.global.exception.exception.AccessTokenExpiredException
 import java.lang.RuntimeException
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
@@ -21,7 +23,7 @@ class JwtReqFilter(
         val accessToken = request.getHeader("Authorization")
         if(accessToken!=null && tokenProvider.getTokenType(accessToken).equals("accessToken")){
             if(tokenProvider.isTokenExpired(accessToken)){
-                throw RuntimeException()//토큰만료
+                throw AccessTokenExpiredException(ErrorCode.TOKEN_EXPIRED)//토큰만료
             }
             registerSecurityContext(request, accessToken)
         }

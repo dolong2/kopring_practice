@@ -14,4 +14,6 @@ enum class ErrorCode(
     NOT_EXIST_MEMBER(404, "해당 유저가 존재하지 않습니다."),
     USER_ALREADY_EXIST(400, "유저가 이미 존재합니다."),
     PASSWORD_NOT_CORRECT(400, "패스워드가 일치하지 않습니다."),
+    POSTING_NOT_EXIST(404, "해당 포스팅이 존재하지 않습니다."),
+    TOKEN_EXPIRED(401, "토큰이 만료되었습니다."),
 }

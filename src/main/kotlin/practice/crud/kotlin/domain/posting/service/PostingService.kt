@@ -9,6 +9,7 @@ import practice.crud.kotlin.domain.posting.dto.res.PostingResDto
 import practice.crud.kotlin.domain.posting.repository.PostingRepository
 import practice.crud.kotlin.global.exception.ErrorCode
 import practice.crud.kotlin.global.exception.exception.NotWriterException
+import practice.crud.kotlin.global.exception.exception.PostingNotExistException
 import practice.crud.kotlin.global.util.CurrentMemberUtil
 
 @Service
@@ -25,7 +26,7 @@ class PostingService(
     @Transactional
     fun deletePosting(postingIdx: Long) {
         val posting = postingRepository.findById(postingIdx)
-            .orElseThrow { throw RuntimeException() }
+            .orElseThrow { throw PostingNotExistException(ErrorCode.POSTING_NOT_EXIST) }
         if(posting.writer != currentMemberUtil.getCurrentMember() || !currentMemberUtil.getCurrentMember().roles.contains(Role.ROLE_ADMIN)){
             throw NotWriterException(ErrorCode.NOT_WRITER_EXCEPTION)
         }
