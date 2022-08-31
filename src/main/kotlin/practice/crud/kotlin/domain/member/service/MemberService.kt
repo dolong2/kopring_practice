@@ -8,9 +8,7 @@ import practice.crud.kotlin.domain.member.dto.res.SignInResDto
 import practice.crud.kotlin.domain.member.repository.MemberRepository
 import practice.crud.kotlin.global.config.security.jwt.TokenProvider
 import practice.crud.kotlin.global.exception.ErrorCode
-import practice.crud.kotlin.global.exception.exception.MemberAlreadyExistException
-import practice.crud.kotlin.global.exception.exception.MemberNotExistException
-import practice.crud.kotlin.global.exception.exception.PasswordNotCorrectException
+import practice.crud.kotlin.global.exception.exception.*
 import practice.crud.kotlin.global.util.CurrentMemberUtil
 import kotlin.RuntimeException
 
@@ -55,5 +53,19 @@ class MemberService(
         logout()
         val member = currentMemberUtil.getCurrentMember()
         memberRepository.delete(member)
+    }
+
+    fun refresh(refreshToken: String):SignInResDto{
+        if(tokenProvider.getTokenType(refreshToken) == "refreshToken")
+            throw NotValidTokenExpiredException(ErrorCode.TOKEN_NOT_VALID)
+        if(!tokenProvider.isTokenExpired(refreshToken))
+            throw RefreshTokenExpiredException(ErrorCode.TOKEN_EXPIRED)
+        val email = tokenProvider.getUserEmail(refreshToken)
+        val accessToken = tokenProvider.createAccessToken(email)
+        return SignInResDto(
+            email = email,
+            accessToken = accessToken,
+            refreshToken = refreshToken
+        )
     }
 }

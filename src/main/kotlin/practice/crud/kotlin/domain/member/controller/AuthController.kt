@@ -2,10 +2,10 @@ package practice.crud.kotlin.domain.member.controller
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.validation.BindingResult
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import practice.crud.kotlin.domain.member.dto.req.MemberReqDto
@@ -19,7 +19,6 @@ import practice.crud.kotlin.global.response.SuccessResponse
 class AuthController(
     private val memberService: MemberService,
 ){
-
     @PostMapping("/signup")
     fun signUp(@Validated @RequestBody memberReqDto: MemberReqDto):ResponseEntity<SuccessResponse>{
         memberService.joinMember(memberReqDto)
@@ -30,5 +29,11 @@ class AuthController(
     fun signIn(@Validated @RequestBody signInReqDto: SignInReqDto):ResponseEntity<SignInResDto>{
         val result = memberService.signIn(signInReqDto)
         return ResponseEntity(result, HttpStatus.OK)
+    }
+
+    @PostMapping("/refresh")
+    fun refresh(@RequestHeader refreshToken: String):ResponseEntity<SignInResDto>{
+        val response = memberService.refresh(refreshToken)
+        return ResponseEntity(response, HttpStatus.OK)
     }
 }
