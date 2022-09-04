@@ -17,7 +17,7 @@ class PostingService(
     private val postingRepository: PostingRepository,
     private val currentMemberUtil: CurrentMemberUtil,
 ){
-    @Transactional
+
     fun writePosting(postingReqDto: PostingReqDto): Long {
         val posting = postingReqDto.toEntity(currentMemberUtil.getCurrentMember())
         return postingRepository.save(posting).id
@@ -48,11 +48,10 @@ class PostingService(
         val postings = postingRepository.findAll();
         return postings.map { PostingResDto(it) }
     }
-    
+
     @Transactional(readOnly = true)
-    fun getOnePosting(postingIdx: Long): PostingResDto?{
+    fun getOnePosting(postingIdx: Long): PostingResDto? {
         val posting = postingRepository.findById(postingIdx).orElseThrow { RuntimeException() }
-        val result = PostingResDto(posting)
-        return result
+        return PostingResDto(posting)
     }
 }

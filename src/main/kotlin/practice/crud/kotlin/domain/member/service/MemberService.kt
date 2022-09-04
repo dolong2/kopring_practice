@@ -2,6 +2,7 @@ package practice.crud.kotlin.domain.member.service
 
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import practice.crud.kotlin.domain.member.dto.req.MemberReqDto
 import practice.crud.kotlin.domain.member.dto.req.SignInReqDto
 import practice.crud.kotlin.domain.member.dto.res.SignInResDto
@@ -44,11 +45,13 @@ class MemberService(
         )
     }
 
+    @Transactional
     fun logout(){
         val member = currentMemberUtil.getCurrentMember()
         member.updateRefreshToken(null)
     }
 
+    @Transactional
     fun withdrawal(){
         logout()
         val member = currentMemberUtil.getCurrentMember()
