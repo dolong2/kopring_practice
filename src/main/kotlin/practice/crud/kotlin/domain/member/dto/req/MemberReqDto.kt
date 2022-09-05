@@ -12,7 +12,7 @@ class MemberReqDto(
     @field:Email
     val email: String,
     @field:NotBlank
-    private val name: String,
+    val name: String,
     @field:NotBlank
     @field:Size(min = 8, max = 85)
     val password: String,
