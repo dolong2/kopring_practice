@@ -8,6 +8,7 @@ import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import practice.crud.kotlin.domain.member.Role
 import java.nio.charset.StandardCharsets
 import java.security.Key
 import java.util.Date
@@ -25,7 +26,8 @@ class TokenProvider {
     }
     private enum class TokenClaimName(val value: String){
         USER_EMAIL("userEmail"),
-        TOKEN_TYPE("tokenType")
+        TOKEN_TYPE("tokenType"),
+        ROLES("roles")
     }
 
     private fun getSignInKey(secretKey: String): Key{
@@ -55,8 +57,7 @@ class TokenProvider {
         }
     }
 
-    private fun createToken(type: TokenType, email: String, expiredTime: Long): String{
-        println(SECRET_KEY)
+    private fun createToken(type: TokenType, email: String, expiredTime: Long, claims: Claims): String{
         val claims = Jwts.claims()
         claims.put(TokenClaimName.USER_EMAIL.value, email)
         claims.put(TokenClaimName.TOKEN_TYPE.value, type.value)
@@ -68,6 +69,10 @@ class TokenProvider {
             .compact()
     }
 
-    fun createAccessToken(email: String): String = createToken(TokenType.ACCESS_TOKEN, email, ACCESS_TOKEN_EXPIRE_TIME)
-    fun createRefreshToken(email: String): String = createToken(TokenType.REFRESH_TOKEN, email, REFRESH_TOKEN_EXPIRE_TIME)
+    fun createAccessToken(email: String, roles: List<Role>): String{
+        val claims = Jwts.claims()
+        claims.put(TokenClaimName.ROLES.value, roles)
+        return createToken(TokenType.ACCESS_TOKEN, email, ACCESS_TOKEN_EXPIRE_TIME, claims)
+    }
+    fun createRefreshToken(email: String): String = createToken(TokenType.REFRESH_TOKEN, email, REFRESH_TOKEN_EXPIRE_TIME, Jwts.claims())
 }

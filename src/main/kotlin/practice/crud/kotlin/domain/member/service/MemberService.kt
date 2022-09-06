@@ -35,7 +35,7 @@ class MemberService(
             .orElseThrow { MemberNotExistException(ErrorCode.NOT_EXIST_MEMBER) }
         if (!passwordEncoder.matches(signInDto.password, member.password))
             throw PasswordNotCorrectException(ErrorCode.PASSWORD_NOT_CORRECT)//패스워드 일치 X
-        val accessToken = tokenProvider.createAccessToken(member.email)
+        val accessToken = tokenProvider.createAccessToken(member.email, member.roles)
         val refreshToken = tokenProvider.createRefreshToken(member.email)
         member.updateRefreshToken(refreshToken)
         return SignInResDto(
@@ -58,17 +58,23 @@ class MemberService(
         memberRepository.delete(member)
     }
 
+    @Transactional
     fun refresh(refreshToken: String):SignInResDto{
-        if(tokenProvider.getTokenType(refreshToken) == "refreshToken")
+        if(tokenProvider.getTokenType(refreshToken) != "refreshToken")
             throw NotValidTokenExpiredException(ErrorCode.TOKEN_NOT_VALID)
-        if(!tokenProvider.isTokenExpired(refreshToken))
+        if(tokenProvider.isTokenExpired(refreshToken))
             throw RefreshTokenExpiredException(ErrorCode.TOKEN_EXPIRED)
         val email = tokenProvider.getUserEmail(refreshToken)
-        val accessToken = tokenProvider.createAccessToken(email)
+
+        val member = memberRepository.findByEmail(email)
+            .orElseThrow { MemberNotExistException(ErrorCode.NOT_EXIST_MEMBER) }
+        val accessToken = tokenProvider.createAccessToken(email, member.roles)
+        val newRefreshToken = tokenProvider.createRefreshToken(email)
+        member.updateRefreshToken(newRefreshToken)
         return SignInResDto(
             email = email,
             accessToken = accessToken,
-            refreshToken = refreshToken
+            refreshToken = newRefreshToken
         )
     }
 }
