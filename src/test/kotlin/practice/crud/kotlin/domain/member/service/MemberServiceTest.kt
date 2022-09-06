@@ -1,17 +1,20 @@
 package practice.crud.kotlin.domain.member.service
 
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import practice.crud.kotlin.domain.member.dto.req.MemberReqDto
 import practice.crud.kotlin.domain.member.dto.req.SignInReqDto
+import practice.crud.kotlin.domain.member.dto.res.SignInResDto
 import practice.crud.kotlin.domain.member.repository.MemberRepository
+import practice.crud.kotlin.global.config.security.auth.AuthDetailService
 import practice.crud.kotlin.global.config.security.jwt.TokenProvider
 import practice.crud.kotlin.global.exception.ErrorCode
 import practice.crud.kotlin.global.exception.exception.MemberNotExistException
@@ -27,6 +30,8 @@ class MemberServiceTest(
     private val currentMemberUtil: CurrentMemberUtil,
     @Autowired
     private val tokenProvider: TokenProvider,
+    @Autowired
+    private val authDetailService: AuthDetailService,
 ) {
 
     @BeforeEach
@@ -89,13 +94,48 @@ class MemberServiceTest(
 
     @Test
     fun logout() {
+        //given
+        registerMember()
+
+        //when
+        memberService.logout()
+
+        //then
+        val member = currentMemberUtil.getCurrentMember()
+        assertThat(member.refreshToken).isEqualTo(null)
     }
 
     @Test
     fun withdrawal() {
+        //given
+        registerMember()
+        val member = currentMemberUtil.getCurrentMember()
+
+        //when
+        memberService.withdrawal()
+
+        //then
+        assertThat(memberRepository.findById(member.id)).isEmpty
     }
 
     @Test
     fun refresh() {
+        //given
+        val signInResDto = registerMember()
+
+        //when, then
+        assertDoesNotThrow { memberService.refresh(signInResDto.refreshToken) }
+    }
+
+    fun registerMember(): SignInResDto{
+        val signInReqDto = SignInReqDto(
+            email = "test@gmail.com",
+            password = "12345678"
+        )
+        val signInResDto = memberService.signIn(signInReqDto)
+        val userDetail = authDetailService.loadUserByUsername(tokenProvider.getUserEmail(signInResDto.accessToken))
+        val authenticationToken = UsernamePasswordAuthenticationToken(userDetail, null, userDetail.authorities)
+        SecurityContextHolder.getContext().authentication = authenticationToken
+        return signInResDto
     }
 }
