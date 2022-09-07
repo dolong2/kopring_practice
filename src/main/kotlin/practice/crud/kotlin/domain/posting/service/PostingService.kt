@@ -27,7 +27,7 @@ class PostingService(
     fun deletePosting(postingIdx: Long) {
         val posting = postingRepository.findById(postingIdx)
             .orElseThrow { throw PostingNotExistException(ErrorCode.POSTING_NOT_EXIST) }
-        if(posting.writer != currentMemberUtil.getCurrentMember() || !currentMemberUtil.getCurrentMember().roles.contains(Role.ROLE_ADMIN)){
+        if(posting.writer != currentMemberUtil.getCurrentMember() && !currentMemberUtil.getCurrentMember().roles.contains(Role.ROLE_ADMIN)){
             throw NotWriterException(ErrorCode.NOT_WRITER_EXCEPTION)
         }
         postingRepository.deleteById(postingIdx)
@@ -50,7 +50,7 @@ class PostingService(
     }
 
     @Transactional(readOnly = true)
-    fun getOnePosting(postingIdx: Long): PostingResDto? {
+    fun getOnePosting(postingIdx: Long): PostingResDto {
         val posting = postingRepository.findById(postingIdx).orElseThrow { RuntimeException() }
         return PostingResDto(posting)
     }

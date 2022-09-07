@@ -1,21 +1,25 @@
 package practice.crud.kotlin.domain.posting.service
 
 import org.assertj.core.api.Assertions.*
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import practice.crud.kotlin.domain.member.dto.req.MemberReqDto
 import practice.crud.kotlin.domain.member.dto.req.SignInReqDto
+import practice.crud.kotlin.domain.member.repository.MemberRepository
 import practice.crud.kotlin.domain.member.service.MemberService
 import practice.crud.kotlin.domain.posting.dto.req.PostingReqDto
+import practice.crud.kotlin.domain.posting.dto.req.PostingUpdateReqDto
 import practice.crud.kotlin.domain.posting.repository.PostingRepository
 import practice.crud.kotlin.global.config.security.auth.AuthDetailService
 import practice.crud.kotlin.global.config.security.jwt.TokenProvider
-import java.lang.RuntimeException
 import java.time.LocalDate
+import kotlin.RuntimeException
 
 @SpringBootTest
 class PostingServiceTest(
@@ -29,6 +33,8 @@ class PostingServiceTest(
     private val postingService: PostingService,
     @Autowired
     private val postingRepository: PostingRepository,
+    @Autowired
+    private val memberRepository: MemberRepository,
 ){
     @BeforeEach
     fun initMember(){
@@ -48,17 +54,85 @@ class PostingServiceTest(
         SecurityContextHolder.getContext().authentication = authenticationToken
     }
 
+    @AfterEach
+    fun resetMember(){
+        memberRepository.deleteAll()
+    }
+
 
     @Test
     fun writePosting(){
-        val postingReqDto: PostingReqDto = PostingReqDto(title = "title", content = "content")
+        //given
+        val postingReqDto = PostingReqDto(title = "title", content = "content")
 
+        //when
         val postingIdx = postingService.writePosting(postingReqDto)
 
+        //then
         val posting = postingRepository.findById(postingIdx).orElseThrow { RuntimeException() }
 
         assertThat(posting.title).isEqualTo(postingReqDto.title)
         assertThat(posting.content).isEqualTo(postingReqDto.content)
         assertThat(posting.date).isEqualTo(LocalDate.now())
+    }
+
+    @Test
+    fun deletePosting(){
+        //given
+        val postingIdx = writeTestPosting()
+
+        //when
+        postingService.deletePosting(postingIdx)
+
+        //then
+        assertThatThrownBy {postingRepository.findById(postingIdx).orElseThrow { RuntimeException() } }
+    }
+
+    @Test
+    fun updatePosting(){
+        //given
+        val postingIdx = writeTestPosting()
+        val postingUpdateReqDto = PostingUpdateReqDto(title = "updatedTitle", content = "updatedContent")
+
+        //when
+        postingService.updatePosting(postingIdx, postingUpdateReqDto)
+
+        //then
+        val posting = postingRepository.findById(postingIdx).orElseThrow { RuntimeException() }
+        assertThat(posting.title).isEqualTo(postingUpdateReqDto.title)
+        assertThat(posting.content).isEqualTo(postingUpdateReqDto.content)
+        assertThat(posting.fixed).isEqualTo(true)
+    }
+
+    @Test
+    fun getAllPosting(){
+        //given
+        writeTestPosting()
+        writeTestPosting()
+        writeTestPosting()
+
+        //when
+        val allPosting = postingService.getAllPosting()
+
+        //then
+        assertThat(allPosting.size).isEqualTo(3)
+    }
+
+    @Test
+    fun getOnePosting(){
+        //given
+        val postingIdx = writeTestPosting()
+
+        //when
+        val postingResDto = postingService.getOnePosting(postingIdx)
+
+        //then
+        assertThat(postingResDto.title).isEqualTo("title")
+        assertThat(postingResDto.content).isEqualTo("content")
+    }
+
+    private fun writeTestPosting():Long{
+        val postingReqDto = PostingReqDto(title = "title", content = "content")
+        return postingService.writePosting(postingReqDto)
     }
 }
