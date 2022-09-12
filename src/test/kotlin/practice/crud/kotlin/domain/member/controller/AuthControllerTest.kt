@@ -73,18 +73,21 @@ internal class AuthControllerTest @Autowired constructor(
 
     @Test
     fun signIn() {
+        //given
         val signInReqDto = SignInReqDto(
             email = "test@gmail.com",
             password = "12345678"
         )
         val bodyData = objectMapper.writeValueAsString(signInReqDto)
 
+        //when
         mockMvc.perform(post("/v1/signin")
             .content(bodyData)
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .characterEncoding("UTF-8"))
 
+        //then
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.email").value(signInReqDto.email))
             .andExpect(jsonPath("$.accessToken").isNotEmpty)
@@ -94,5 +97,22 @@ internal class AuthControllerTest @Autowired constructor(
 
     @Test
     fun refresh() {
+        //given
+        val signInReqDto = SignInReqDto(
+            email = "test@gmail.com",
+            password = "12345678"
+        )
+        val signInResDto = memberService.signIn(signInReqDto)
+
+        //when
+        mockMvc.perform(post("/v1/refresh")
+            .header("refreshToken", signInResDto.refreshToken).contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .characterEncoding("UTF-8"))
+
+        //then
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.accessToken").isNotEmpty)
+            .andExpect(jsonPath("$.accessToken").isString)
     }
 }
