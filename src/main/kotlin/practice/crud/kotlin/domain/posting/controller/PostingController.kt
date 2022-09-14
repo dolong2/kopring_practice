@@ -25,7 +25,7 @@ class PostingController(
     @PostMapping
     fun writePosting(@RequestBody @Validated postingReqDto: PostingReqDto): ResponseEntity<SuccessResponse>{
         postingService.writePosting(postingReqDto)
-        return ResponseEntity(SuccessResponse, HttpStatus.CREATED);
+        return ResponseEntity(SuccessResponse, HttpStatus.CREATED)
     }
 
     @DeleteMapping("/{postingIdx}")
