@@ -83,7 +83,7 @@ internal class PostingControllerTest(
             .characterEncoding("UTF-8"))
 
         //then
-            .andExpect(status().isCreated)
+            .andExpect(status().isOk)
     }
 
     @Test
