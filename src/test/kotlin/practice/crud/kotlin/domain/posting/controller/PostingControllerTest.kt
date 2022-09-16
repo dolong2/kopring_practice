@@ -70,14 +70,19 @@ internal class PostingControllerTest(
 
     @Test
     fun writePosting() {
+        //given
         val postingReqDto = PostingReqDto(title = "title", content = "content")
         val body = objectMapper.writeValueAsString(postingReqDto)
+
+        //when
         mockMvc.perform(post("/v1/posting")
             .content(body)
             .header("Authorization", signInResDto.accessToken)
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .characterEncoding("UTF-8"))
+
+        //then
             .andExpect(status().isCreated)
     }
 
