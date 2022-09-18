@@ -15,8 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.event.annotation.BeforeTestClass
 import org.springframework.test.context.event.annotation.BeforeTestMethod
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import practice.crud.kotlin.domain.member.dto.req.MemberReqDto
 import practice.crud.kotlin.domain.member.dto.req.SignInReqDto
@@ -121,6 +121,31 @@ internal class PostingControllerTest(
 
     @Test
     fun getAll() {
+        val posting = Posting(
+            title = "title",
+            content = "content",
+            writer = currentMemberUtil.getCurrentMember(),
+            date = LocalDate.now(),
+            fixed = false
+        )
+        val posting1 = Posting(
+            title = "title2",
+            content = "content2",
+            writer = currentMemberUtil.getCurrentMember(),
+            date = LocalDate.now(),
+            fixed = false
+        )
+        postingRepository.save(posting)
+        postingRepository.save(posting1)
+
+        mockMvc.perform(get("/v1/posting")
+            .header("Authorization", signInResDto.accessToken)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .characterEncoding("UTF-8"))
+
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.length()").value(2))
     }
 
     @Test
