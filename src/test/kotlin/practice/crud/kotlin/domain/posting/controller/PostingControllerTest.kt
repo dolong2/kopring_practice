@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.event.annotation.BeforeTestClass
 import org.springframework.test.context.event.annotation.BeforeTestMethod
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import practice.crud.kotlin.domain.member.dto.req.MemberReqDto
@@ -22,9 +23,13 @@ import practice.crud.kotlin.domain.member.dto.req.SignInReqDto
 import practice.crud.kotlin.domain.member.dto.res.SignInResDto
 import practice.crud.kotlin.domain.member.repository.MemberRepository
 import practice.crud.kotlin.domain.member.service.MemberService
+import practice.crud.kotlin.domain.posting.Posting
 import practice.crud.kotlin.domain.posting.dto.req.PostingReqDto
+import practice.crud.kotlin.domain.posting.repository.PostingRepository
 import practice.crud.kotlin.global.config.security.auth.AuthDetailService
 import practice.crud.kotlin.global.config.security.jwt.TokenProvider
+import practice.crud.kotlin.global.util.CurrentMemberUtil
+import java.time.LocalDate
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -41,6 +46,10 @@ internal class PostingControllerTest(
     private val memberRepository: MemberRepository,
     @Autowired
     private val tokenProvider: TokenProvider,
+    @Autowired
+    private val currentMemberUtil: CurrentMemberUtil,
+    @Autowired
+    private val postingRepository: PostingRepository,
 ) {
 
     var signInResDto: SignInResDto = SignInResDto(email = "", accessToken = "", refreshToken = "")
@@ -88,6 +97,26 @@ internal class PostingControllerTest(
 
     @Test
     fun deletePosting() {
+        //given
+        val posting = Posting(
+            title = "title",
+            content = "content",
+            writer = currentMemberUtil.getCurrentMember(),
+            date = LocalDate.now(),
+            fixed = false
+        )
+        val id = postingRepository.save(posting).id
+
+        //when
+        mockMvc.perform(delete("/v1/posting/"+id)
+            .header("Authorization", signInResDto.accessToken)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .characterEncoding("UTF-8"))
+
+        //then
+            .andExpect(status().isOk)
+
     }
 
     @Test
