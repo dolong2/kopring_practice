@@ -121,6 +121,7 @@ internal class PostingControllerTest(
 
     @Test
     fun getAll() {
+        //given
         val posting = Posting(
             title = "title",
             content = "content",
@@ -138,18 +139,41 @@ internal class PostingControllerTest(
         postingRepository.save(posting)
         postingRepository.save(posting1)
 
+        //when
         mockMvc.perform(get("/v1/posting")
             .header("Authorization", signInResDto.accessToken)
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .characterEncoding("UTF-8"))
 
+        //then
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.length()").value(2))
     }
 
     @Test
     fun getOne() {
+        //given
+        val posting = Posting(
+            title = "title",
+            content = "content",
+            writer = currentMemberUtil.getCurrentMember(),
+            date = LocalDate.now(),
+            fixed = false
+        )
+        val id = postingRepository.save(posting).id
+
+        //when
+        mockMvc.perform(get("/v1/posting/"+id)
+            .header("Authorization", signInResDto.accessToken)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .characterEncoding("UTF-8"))
+
+        //then
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.title").value(posting.title))
+            .andExpect(jsonPath("$.content").value(posting.content))
     }
 
     @Test
