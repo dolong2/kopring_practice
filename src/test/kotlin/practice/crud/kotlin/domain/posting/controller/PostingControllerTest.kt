@@ -25,6 +25,7 @@ import practice.crud.kotlin.domain.member.repository.MemberRepository
 import practice.crud.kotlin.domain.member.service.MemberService
 import practice.crud.kotlin.domain.posting.Posting
 import practice.crud.kotlin.domain.posting.dto.req.PostingReqDto
+import practice.crud.kotlin.domain.posting.dto.req.PostingUpdateReqDto
 import practice.crud.kotlin.domain.posting.repository.PostingRepository
 import practice.crud.kotlin.global.config.security.auth.AuthDetailService
 import practice.crud.kotlin.global.config.security.jwt.TokenProvider
@@ -178,5 +179,31 @@ internal class PostingControllerTest(
 
     @Test
     fun updatePosting() {
+        //given
+        val posting = Posting(
+            title = "title",
+            content = "content",
+            writer = currentMemberUtil.getCurrentMember(),
+            date = LocalDate.now(),
+            fixed = false
+        )
+        val id = postingRepository.save(posting).id
+
+        val updateReqDto = PostingUpdateReqDto(
+            title = "testTitle",
+            content = "testContent"
+        )
+        val content = objectMapper.writeValueAsString(updateReqDto)
+
+        //when
+        mockMvc.perform(put("/v1/posting/"+id)
+            .header("Authorization", signInResDto.accessToken)
+            .content(content)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .characterEncoding("UTF-8"))
+
+            //then
+            .andExpect(status().isOk)
     }
 }
