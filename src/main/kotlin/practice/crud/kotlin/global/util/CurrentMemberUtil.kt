@@ -1,7 +1,6 @@
 package practice.crud.kotlin.global.util
 
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Component
 import practice.crud.kotlin.domain.member.Member
 import practice.crud.kotlin.domain.member.repository.MemberRepository
@@ -12,14 +11,8 @@ class CurrentMemberUtil(
     private val memberRepository: MemberRepository
 ){
     private fun getCurrentEmail():String{
-        val principal = SecurityContextHolder.getContext().authentication.principal
-        val email: String
-        if(principal is UserDetails){
-            email = (principal as AuthDetails).getEmail()
-        }else{
-            email = principal.toString()
-        }
-        return email
+        val principal = SecurityContextHolder.getContext().authentication.principal as AuthDetails
+        return principal.getEmail()
     }
 
     fun getCurrentMember():Member =
