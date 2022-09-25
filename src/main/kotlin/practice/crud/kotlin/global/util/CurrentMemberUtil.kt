@@ -10,10 +10,9 @@ import practice.crud.kotlin.global.config.security.auth.AuthDetails
 class CurrentMemberUtil(
     private val memberRepository: MemberRepository
 ){
-    private fun getCurrentEmail():String{
-        val principal = SecurityContextHolder.getContext().authentication.principal as AuthDetails
-        return principal.getEmail()
-    }
+    private fun getCurrentEmail():String =
+        (SecurityContextHolder.getContext().authentication.principal as AuthDetails)
+            .getEmail()
 
     fun getCurrentMember():Member =
         memberRepository.findByEmail(getCurrentEmail())
