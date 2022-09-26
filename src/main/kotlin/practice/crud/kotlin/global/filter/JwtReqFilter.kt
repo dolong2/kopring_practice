@@ -9,31 +9,27 @@ import practice.crud.kotlin.global.config.security.auth.AuthDetailService
 import practice.crud.kotlin.global.config.security.jwt.TokenProvider
 import practice.crud.kotlin.global.exception.ErrorCode
 import practice.crud.kotlin.global.exception.exception.AccessTokenExpiredException
-import java.lang.RuntimeException
+import practice.crud.kotlin.global.exception.exception.TokenNotValidException
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import kotlin.RuntimeException
 
 @Component
 class JwtReqFilter(
     val tokenProvider: TokenProvider,
-    val authDetailService: AuthDetailService,
+    val registerUserInfo: RegisterUserInfo,
 ): OncePerRequestFilter() {
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
         val accessToken = request.getHeader("Authorization")
-        if(accessToken!=null && tokenProvider.getTokenType(accessToken).equals("accessToken")){
+        if(accessToken!=null){
             if(tokenProvider.isTokenExpired(accessToken)){
                 throw AccessTokenExpiredException(ErrorCode.TOKEN_EXPIRED)//토큰만료
+            }else if(!tokenProvider.getTokenType(accessToken).equals("accessToken")){
+                throw TokenNotValidException(ErrorCode.TOKEN_NOT_VALID)
             }
-            registerSecurityContext(request, accessToken)
+            registerUserInfo.registerSecurityContext(request, accessToken)
         }
         filterChain.doFilter(request, response)
-    }
-
-    private fun registerSecurityContext(request: HttpServletRequest, accessToken: String){
-        val userDetail = authDetailService.loadUserByUsername(tokenProvider.getUserEmail(accessToken))
-        val authenticationToken = UsernamePasswordAuthenticationToken(userDetail, null, userDetail.authorities)
-        authenticationToken.details = WebAuthenticationDetailsSource().buildDetails(request)
-        SecurityContextHolder.getContext().authentication = authenticationToken
     }
 }

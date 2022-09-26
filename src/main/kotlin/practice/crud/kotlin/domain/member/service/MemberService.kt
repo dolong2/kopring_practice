@@ -61,7 +61,7 @@ class MemberService(
     @Transactional
     fun refresh(refreshToken: String):SignInResDto{
         if(tokenProvider.getTokenType(refreshToken) != "refreshToken")
-            throw NotValidTokenExpiredException(ErrorCode.TOKEN_NOT_VALID)
+            throw TokenNotValidException(ErrorCode.TOKEN_NOT_VALID)
         if(tokenProvider.isTokenExpired(refreshToken))
             throw RefreshTokenExpiredException(ErrorCode.TOKEN_EXPIRED)
         val email = tokenProvider.getUserEmail(refreshToken)

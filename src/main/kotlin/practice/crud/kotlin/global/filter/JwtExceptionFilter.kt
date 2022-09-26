@@ -9,6 +9,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 import practice.crud.kotlin.global.exception.ErrorCode
 import practice.crud.kotlin.global.exception.exception.AccessTokenExpiredException
 import practice.crud.kotlin.global.exception.exception.BasicException
+import practice.crud.kotlin.global.exception.exception.TokenNotValidException
 import java.io.IOException
 import javax.servlet.FilterChain
 import javax.servlet.ServletException
@@ -31,8 +32,10 @@ class JwtExceptionFilter : OncePerRequestFilter() {
             filterChain.doFilter(request, response)
         } catch (e: AccessTokenExpiredException) {
             writeLog(request, response, e)
-            return
+        } catch(e: TokenNotValidException){
+            writeLog(request, response, e)
         } catch (e: Exception) {
+
             writeLog(request, response, e)
         }
     }
