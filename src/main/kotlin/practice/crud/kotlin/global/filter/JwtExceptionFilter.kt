@@ -35,7 +35,6 @@ class JwtExceptionFilter : OncePerRequestFilter() {
         } catch(e: TokenNotValidException){
             writeLog(request, response, e)
         } catch (e: Exception) {
-
             writeLog(request, response, e)
         }
     }
@@ -58,14 +57,6 @@ class JwtExceptionFilter : OncePerRequestFilter() {
         response.status = e.errorCode.code
         response.contentType = "Application/json"
         response.writer.write(json)
-    }
-
-    @Throws(JsonProcessingException::class)
-    private fun getJson(e: BasicException): String {
-        val map: MutableMap<String, Any?> = HashMap()
-        map["msg"] = e.message
-        map["status"] = e.errorCode.code
-        return objectMapper!!.writeValueAsString(map)
     }
 
     @Throws(IOException::class)
