@@ -28,6 +28,7 @@ class MemberService(
         return memberRepository.save(member).id
     }
 
+    @Transactional(rollbackFor = [Exception::class])
     fun signIn(signInDto: SignInReqDto):SignInResDto{
         if(!memberRepository.existsByEmail(signInDto.email))
             throw MemberNotExistException(ErrorCode.NOT_EXIST_MEMBER)
@@ -45,20 +46,20 @@ class MemberService(
         )
     }
 
-    @Transactional
+    @Transactional(rollbackFor = [Exception::class])
     fun logout(){
         val member = currentMemberUtil.getCurrentMember()
         member.updateRefreshToken(null)
     }
 
-    @Transactional
+    @Transactional(rollbackFor = [Exception::class])
     fun withdrawal(){
         logout()
         val member = currentMemberUtil.getCurrentMember()
         memberRepository.delete(member)
     }
 
-    @Transactional
+    @Transactional(rollbackFor = [Exception::class])
     fun refresh(refreshToken: String):SignInResDto{
         if(tokenProvider.getTokenType(refreshToken) != "refreshToken")
             throw TokenNotValidException(ErrorCode.TOKEN_NOT_VALID)

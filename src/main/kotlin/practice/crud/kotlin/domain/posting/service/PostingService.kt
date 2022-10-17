@@ -23,7 +23,7 @@ class PostingService(
         return postingRepository.save(posting).id
     }
 
-    @Transactional
+    @Transactional(rollbackFor = [Exception::class])
     fun deletePosting(postingIdx: Long) {
         val posting = postingRepository.findById(postingIdx)
             .orElseThrow { throw PostingNotExistException(ErrorCode.POSTING_NOT_EXIST) }
@@ -33,7 +33,7 @@ class PostingService(
         postingRepository.deleteById(postingIdx)
     }
 
-    @Transactional
+    @Transactional(rollbackFor = [Exception::class])
     fun updatePosting(postingIdx: Long, postingUpdateReqDto: PostingUpdateReqDto) {
         val posting = postingRepository.findById(postingIdx).orElseThrow { RuntimeException() }
         val writer = currentMemberUtil.getCurrentMember()
@@ -43,13 +43,13 @@ class PostingService(
         posting.update(postingUpdateReqDto)
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, rollbackFor = [Exception::class])
     fun getAllPosting(): List<PostingResDto>{
         val postings = postingRepository.findAll();
         return postings.map { PostingResDto(it) }
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, rollbackFor = [Exception::class])
     fun getOnePosting(postingIdx: Long): PostingResDto {
         val posting = postingRepository.findById(postingIdx).orElseThrow { RuntimeException() }
         return PostingResDto(posting)
