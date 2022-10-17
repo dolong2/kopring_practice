@@ -17,6 +17,5 @@ class CurrentMemberUtil(
             .getEmail()
 
     fun getCurrentMember():Member =
-        memberRepository.findByEmail(getCurrentEmail())
-            .orElseThrow{MemberNotExistException(ErrorCode.NOT_EXIST_MEMBER)}
+        memberRepository.findByEmail(getCurrentEmail())?:throw MemberNotExistException(ErrorCode.NOT_EXIST_MEMBER)
 }

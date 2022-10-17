@@ -13,5 +13,5 @@ class AuthDetailService(
 ): UserDetailsService {
     override fun loadUserByUsername(username: String?): UserDetails =
          AuthDetails(memberRepository.findByEmail(username)
-             .orElseThrow{MemberNotExistException(ErrorCode.NOT_EXIST_MEMBER)})
+             ?: throw MemberNotExistException(ErrorCode.NOT_EXIST_MEMBER))
 }

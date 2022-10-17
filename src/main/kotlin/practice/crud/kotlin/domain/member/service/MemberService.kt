@@ -32,7 +32,7 @@ class MemberService(
         if(!memberRepository.existsByEmail(signInDto.email))
             throw MemberNotExistException(ErrorCode.NOT_EXIST_MEMBER)
         val member = memberRepository.findByEmail(signInDto.email)
-            .orElseThrow { MemberNotExistException(ErrorCode.NOT_EXIST_MEMBER) }
+            ?: throw MemberNotExistException(ErrorCode.NOT_EXIST_MEMBER)
         if (!passwordEncoder.matches(signInDto.password, member.password))
             throw PasswordNotCorrectException(ErrorCode.PASSWORD_NOT_CORRECT)//패스워드 일치 X
         val accessToken = tokenProvider.createAccessToken(member.email, member.roles)
@@ -67,7 +67,7 @@ class MemberService(
         val email = tokenProvider.getUserEmail(refreshToken)
 
         val member = memberRepository.findByEmail(email)
-            .orElseThrow { MemberNotExistException(ErrorCode.NOT_EXIST_MEMBER) }
+            ?: throw MemberNotExistException(ErrorCode.NOT_EXIST_MEMBER)
         val accessToken = tokenProvider.createAccessToken(email, member.roles)
         val newRefreshToken = tokenProvider.createRefreshToken(email)
         member.updateRefreshToken(newRefreshToken)
