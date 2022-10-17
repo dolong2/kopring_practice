@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import practice.crud.kotlin.domain.posting.dto.req.PostingReqDto
 import practice.crud.kotlin.domain.posting.dto.req.PostingUpdateReqDto
+import practice.crud.kotlin.domain.posting.dto.res.PostingListResDto
 import practice.crud.kotlin.domain.posting.dto.res.PostingResDto
 import practice.crud.kotlin.domain.posting.service.PostingService
 import practice.crud.kotlin.global.response.SuccessResponse
@@ -35,8 +36,8 @@ class PostingController(
     }
 
     @GetMapping
-    fun getAll(): ResponseEntity<List<PostingResDto>>{
-        val result = postingService.getAllPosting();
+    fun getAll(): ResponseEntity<PostingListResDto>{
+        val result = postingService.getAllPosting()
         return ResponseEntity(result, HttpStatus.OK)
     }
 

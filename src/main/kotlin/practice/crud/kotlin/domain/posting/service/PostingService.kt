@@ -6,6 +6,7 @@ import practice.crud.kotlin.domain.member.Role
 import practice.crud.kotlin.domain.posting.dto.req.PostingReqDto
 import practice.crud.kotlin.domain.posting.dto.req.PostingUpdateReqDto
 import practice.crud.kotlin.domain.posting.dto.res.PostingResDto
+import practice.crud.kotlin.domain.posting.dto.res.PostingListResDto
 import practice.crud.kotlin.domain.posting.repository.PostingRepository
 import practice.crud.kotlin.global.exception.ErrorCode
 import practice.crud.kotlin.global.exception.exception.NotWriterException
@@ -44,9 +45,11 @@ class PostingService(
     }
 
     @Transactional(readOnly = true, rollbackFor = [Exception::class])
-    fun getAllPosting(): List<PostingResDto>{
+    fun getAllPosting(): PostingListResDto{
         val postings = postingRepository.findAll();
-        return postings.map { PostingResDto(it) }
+        return PostingListResDto(
+            postings.map { PostingResDto(it) }
+        )
     }
 
     @Transactional(readOnly = true, rollbackFor = [Exception::class])
