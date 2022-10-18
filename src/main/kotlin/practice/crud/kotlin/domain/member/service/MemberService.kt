@@ -42,7 +42,7 @@ class MemberService(
             throw PasswordNotCorrectException(ErrorCode.PASSWORD_NOT_CORRECT)//패스워드 일치 X
         val accessToken = tokenProvider.createAccessToken(member.email, member.roles)
         val refreshToken = tokenProvider.createRefreshToken(member.email)
-        redisUtil.setData(refreshToken, member.email, 1000L * 60 * 60 * 24 * 30 * 6)
+        redisUtil.setData(member.email, refreshToken, 1000L * 60 * 60 * 24 * 30 * 6)
         return SignInResDto(
             email = member.email,
             accessToken = accessToken,
@@ -53,7 +53,7 @@ class MemberService(
     @Transactional(rollbackFor = [Exception::class])
     fun logout(){
         val member = currentMemberUtil.getCurrentMember()
-        member.updateRefreshToken(null)
+        redisUtil.deleteData(member.email)
     }
 
     @Transactional(rollbackFor = [Exception::class])
@@ -75,7 +75,7 @@ class MemberService(
             ?: throw MemberNotExistException(ErrorCode.NOT_EXIST_MEMBER)
         val accessToken = tokenProvider.createAccessToken(email, member.roles)
         val newRefreshToken = tokenProvider.createRefreshToken(email)
-        member.updateRefreshToken(newRefreshToken)
+        redisUtil.setData(member.email, newRefreshToken, 1000L * 60 * 60 *24 * 30 * 6)
         return SignInResDto(
             email = email,
             accessToken = accessToken,
