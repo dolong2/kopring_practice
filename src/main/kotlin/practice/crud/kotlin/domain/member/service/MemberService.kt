@@ -42,7 +42,7 @@ class MemberService(
             throw PasswordNotCorrectException(ErrorCode.PASSWORD_NOT_CORRECT)//패스워드 일치 X
         val accessToken = tokenProvider.createAccessToken(member.email, member.roles)
         val refreshToken = tokenProvider.createRefreshToken(member.email)
-        redisUtil.setData(member.email, refreshToken, 1000L * 60 * 60 * 24 * 30 * 6)
+        redisUtil.setData(refreshToken, member.email, 1000L * 60 * 60 * 24 * 30 * 6)
         return SignInResDto(
             email = member.email,
             accessToken = accessToken,
