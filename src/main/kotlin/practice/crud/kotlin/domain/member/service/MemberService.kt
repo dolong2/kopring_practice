@@ -1,5 +1,7 @@
 package practice.crud.kotlin.domain.member.service
 
+import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.core.ValueOperations
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -7,6 +9,7 @@ import practice.crud.kotlin.domain.member.dto.req.MemberReqDto
 import practice.crud.kotlin.domain.member.dto.req.SignInReqDto
 import practice.crud.kotlin.domain.member.dto.res.SignInResDto
 import practice.crud.kotlin.domain.member.repository.MemberRepository
+import practice.crud.kotlin.global.config.redis.RedisUtil
 import practice.crud.kotlin.global.config.security.jwt.TokenProvider
 import practice.crud.kotlin.global.exception.ErrorCode
 import practice.crud.kotlin.global.exception.exception.*
@@ -18,7 +21,8 @@ class MemberService(
     private val memberRepository: MemberRepository,
     private val tokenProvider: TokenProvider,
     private val passwordEncoder: PasswordEncoder,
-    private val currentMemberUtil: CurrentMemberUtil
+    private val currentMemberUtil: CurrentMemberUtil,
+    private val redisUtil: RedisUtil,
 ){
     fun joinMember(memberReqDto: MemberReqDto): Long{
         if(memberRepository.existsByEmail(memberReqDto.email))
@@ -38,7 +42,7 @@ class MemberService(
             throw PasswordNotCorrectException(ErrorCode.PASSWORD_NOT_CORRECT)//패스워드 일치 X
         val accessToken = tokenProvider.createAccessToken(member.email, member.roles)
         val refreshToken = tokenProvider.createRefreshToken(member.email)
-        member.updateRefreshToken(refreshToken)
+        redisUtil.setData(member.email, refreshToken, 1000L * 60 * 60 * 24 * 30 * 6)
         return SignInResDto(
             email = member.email,
             accessToken = accessToken,
