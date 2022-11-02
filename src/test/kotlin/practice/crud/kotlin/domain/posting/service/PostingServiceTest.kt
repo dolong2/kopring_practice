@@ -115,7 +115,7 @@ class PostingServiceTest(
         val allPosting = postingService.getAllPosting()
 
         //then
-        assertThat(allPosting.size).isEqualTo(3)
+        assertThat(allPosting.list.size).isEqualTo(3)
     }
 
     @Test

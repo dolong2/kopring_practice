@@ -149,7 +149,7 @@ internal class PostingControllerTest(
 
         //then
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$.list.length()").value(2))
     }
 
     @Test

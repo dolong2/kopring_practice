@@ -14,6 +14,7 @@ import practice.crud.kotlin.domain.member.dto.req.MemberReqDto
 import practice.crud.kotlin.domain.member.dto.req.SignInReqDto
 import practice.crud.kotlin.domain.member.dto.res.SignInResDto
 import practice.crud.kotlin.domain.member.repository.MemberRepository
+import practice.crud.kotlin.global.config.redis.RedisUtil
 import practice.crud.kotlin.global.config.security.auth.AuthDetailService
 import practice.crud.kotlin.global.config.security.jwt.TokenProvider
 import practice.crud.kotlin.global.exception.ErrorCode
@@ -32,6 +33,8 @@ class MemberServiceTest(
     private val tokenProvider: TokenProvider,
     @Autowired
     private val authDetailService: AuthDetailService,
+    @Autowired
+    private val redisUtil: RedisUtil,
 ) {
 
     @BeforeEach
@@ -102,7 +105,7 @@ class MemberServiceTest(
 
         //then
         val member = currentMemberUtil.getCurrentMember()
-        assertThat(member.refreshToken).isEqualTo(null)
+        assertThat(redisUtil.getData(member.email)).isNull()
     }
 
     @Test
