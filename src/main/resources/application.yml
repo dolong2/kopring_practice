@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: ${DB_DRIVER}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: mysql
+    show-sql: true
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 2GB
+      enabled: true
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type: trace
+messages:
+  basename: i18n/exception
+  encoding: UTF-8
+jwt:
+  secret: ${JWT_SECRET}
