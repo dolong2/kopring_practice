@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.event.annotation.BeforeTestClass
 import org.springframework.test.context.event.annotation.BeforeTestMethod
 import org.springframework.test.web.servlet.MockMvc
@@ -33,6 +34,7 @@ import practice.crud.kotlin.global.util.CurrentMemberUtil
 import java.time.LocalDate
 
 @SpringBootTest
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
 internal class PostingControllerTest(
     @Autowired

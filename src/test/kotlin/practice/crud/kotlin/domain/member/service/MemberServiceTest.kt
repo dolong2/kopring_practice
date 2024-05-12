@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.test.context.ActiveProfiles
 import practice.crud.kotlin.domain.member.dto.req.MemberReqDto
 import practice.crud.kotlin.domain.member.dto.req.SignInReqDto
 import practice.crud.kotlin.domain.member.dto.res.SignInResDto
@@ -22,6 +23,7 @@ import practice.crud.kotlin.global.exception.exception.MemberNotExistException
 import practice.crud.kotlin.global.util.CurrentMemberUtil
 
 @SpringBootTest
+@ActiveProfiles("test")
 class MemberServiceTest(
     @Autowired
     private val memberService: MemberService,

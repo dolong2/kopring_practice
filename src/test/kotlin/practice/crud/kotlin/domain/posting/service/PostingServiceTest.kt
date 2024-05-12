@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.test.context.ActiveProfiles
 import practice.crud.kotlin.domain.member.dto.req.MemberReqDto
 import practice.crud.kotlin.domain.member.dto.req.SignInReqDto
 import practice.crud.kotlin.domain.member.repository.MemberRepository
@@ -22,6 +23,7 @@ import java.time.LocalDate
 import kotlin.RuntimeException
 
 @SpringBootTest
+@ActiveProfiles("test")
 class PostingServiceTest(
     @Autowired
     private val memberService: MemberService,
