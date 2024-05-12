@@ -1,0 +1,29 @@
+spring:
+  datasource :
+    url: ${TEST_DB_URL}
+    driverClassName: ${TEST_DB_DRIVER}
+    username: ${TEST_DB_USER}
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: ${TEST_DB_PLATFORM}
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 2GB
+      enabled: true
+  redis:
+    host: ${TEST_REDIS_HOST}
+    port: ${TEST_REDIS_PORT}
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type: trace
+messages:
+  basename: i18n/exception
+  encoding: UTF-8
+jwt:
+  secret: ${TEST_JWT_SECRET}
